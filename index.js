@@ -34,14 +34,11 @@ const Event = sequelize.define('event', {
 const { Op } = require('sequelize')
 
 app.get('/events', (request, response) => {
-  Event.findAll(
-    {
+  Event.findAll({
       where: {
-        sdate: {[Op.gte]: new Date()}
-      },
+        sdate: {[Op.gte]: new Date()}},
       attributes: ['title', 'sdate', 'edate']
-    }
-  )
+  })
   .then(events => {
     response.send({ events })
   })
@@ -49,7 +46,7 @@ app.get('/events', (request, response) => {
 
 
 app.get('/events/:id', (request, response) => {
-const eventId = request.params.id
+  const eventId = request.params.id
   Event.findById(eventId).then(events => {
     response.send({ events })
   })
@@ -58,23 +55,23 @@ const eventId = request.params.id
 
 app.post('/events', (req, res) => {
   const event = req.body
-  console.log(event)
-   if (event.sdate > new Date() && event.sdate > event.edate ){
+  const x = new Date(event.sdate)
+  const y = new Date(event.edate)
+
+   if (x > new Date() && y>x)){
   Event.create(event)
     .then(entity => {
       res.json(entity)
       res.end()
-  })
-  .catch(err => {
+    })
+    .catch(err => {
     res.status(422)
     console.error(err);
     res.json({ message: 'Oops! There was an error getting the . Please try again' })
-})
-}
-else {
-res.status(401).send({
-  message: 'Start date is not valid'
-})
-}
-
+    })
+  }
+  else {
+  res.status(401).send({
+  message: 'Start date is not valid'})
+  }
 })

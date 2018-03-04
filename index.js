@@ -58,7 +58,7 @@ app.post('/events', (req, res) => {
   const x = new Date(event.sdate)
   const y = new Date(event.edate)
 
-   if (x > new Date() && y>x)){
+   if (x > new Date() && y>x){
   Event.create(event)
     .then(entity => {
       res.json(entity)
@@ -74,4 +74,44 @@ app.post('/events', (req, res) => {
   res.status(401).send({
   message: 'Start date is not valid'})
   }
+})
+
+ const updateOrPatch = (req, res) => {
+  const eventId = Number(req.params.id)
+  const updates = req.body
+
+  Event.findById(req.params.id)
+    .then(entity => {
+      return entity.update(updates)
+    })
+    .then(final => {
+      res.json(final)
+    })
+    .catch(error => {
+      res.status(500).send({
+        message: `Something went wrong`,
+        error
+      })
+    })
+}
+
+app.put('/events/:id', updateOrPatch)
+
+app.delete('/events/:id', (req, res) => {
+  const eventId = Number(req.params.id)
+  Event.findById(req.params.id)
+    .then(entity => {
+      return entity.destroy()
+    })
+    .then(_ => {
+      res.send({
+        message: 'The event was deleted succesfully'
+      })
+    })
+    .catch(error => {
+      res.status(500).send({
+        message: `Something went wrong`,
+        error
+      })
+    })
 })
